@@ -1,25 +1,11 @@
 name: Publish release image
 
-# Disabled by default: `workflow_dispatch` is the only trigger, so it never runs
-# automatically, and a manual run also requires `confirm: true`. To enable,
-# replace the `on:` block with a tag push and drop the `confirm` input/guard:
-#
-#   on:
-#     push:
-#       tags:
-#         - 'db-auth-gateway-v*'
+# Triggered by pushing a release tag (v1.2.3). The tag drives the published
+# image tags: full version, major.minor, and latest.
 on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: "Image tag to publish (e.g. db-auth-gateway-v1.2.3). Defaults to main-<sha>."
-        required: false
-        type: string
-      confirm:
-        description: "Type true to confirm publishing grafana/db-auth-gateway."
-        required: true
-        type: boolean
-        default: false
+  push:
+    tags:
+      - 'v*'
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.ref }}"
@@ -36,8 +22,6 @@ jobs:
   publish:
     name: Build and push release image
     runs-on: ubuntu-latest
-    # Guard: refuse to run unless the operator explicitly confirmed.
-    if: ${{ inputs.confirm == true }}
     permissions:
       contents: read
       id-token: write # OIDC for login-to-gar (workload identity)
@@ -54,21 +38,16 @@ jobs:
       # credentials in CI), the same as the push-to-gar job in ci.yml.
       - name: Login to GAR
         uses: grafana/shared-workflows/actions/login-to-gar@1f541877ceb22c7be7667d8a8df04984aeac9f9d # login-to-gar/v1.0.3
-        with:
-          environment: prod
 
       - name: Extract image metadata (tags, labels)
         id: meta
         uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v6.1.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          # On tag pushes, semver + latest are produced automatically.
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/') }}
-            type=sha,prefix=main-,format=short,enable=${{ !startsWith(github.ref, 'refs/tags/') }}
-            type=raw,value=${{ inputs.tag }},enable=${{ inputs.tag != '' }}
+            type=raw,value=latest
 
       - name: Build and push multi-arch image
         uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
@@ -82,6 +61,6 @@ jobs:
           provenance: true
           sbom: true
           build-args: |
-            VERSION=${{ inputs.tag != '' && inputs.tag || format('main-{0}', github.sha) }}
+            VERSION=${{ steps.meta.outputs.version }}
             BRANCH=${{ github.ref_name }}
             REVISION=${{ github.sha }}
