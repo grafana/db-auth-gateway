@@ -1,0 +1,87 @@
+name: Publish release image
+
+# Disabled by default: `workflow_dispatch` is the only trigger, so it never runs
+# automatically, and a manual run also requires `confirm: true`. To enable,
+# replace the `on:` block with a tag push and drop the `confirm` input/guard:
+#
+#   on:
+#     push:
+#       tags:
+#         - 'db-auth-gateway-v*'
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Image tag to publish (e.g. db-auth-gateway-v1.2.3). Defaults to main-<sha>."
+        required: false
+        type: string
+      confirm:
+        description: "Type true to confirm publishing grafana/db-auth-gateway."
+        required: true
+        type: boolean
+        default: false
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  REGISTRY: us-docker.pkg.dev/grafanalabs-global/dockerhub-db-auth-gateway-prod-mirror
+  IMAGE_NAME: db-auth-gateway
+
+jobs:
+  publish:
+    name: Build and push release image
+    runs-on: ubuntu-latest
+    # Guard: refuse to run unless the operator explicitly confirmed.
+    if: ${{ inputs.confirm == true }}
+    permissions:
+      contents: read
+      id-token: write # OIDC for login-to-gar (workload identity)
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@06116385d9baf250c9f4dcb4858b16962ea869c3 # v4.1.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
+
+      # Authenticate to the registry via OIDC workload identity (no static
+      # credentials in CI), the same as the push-to-gar job in ci.yml.
+      - name: Login to GAR
+        uses: grafana/shared-workflows/actions/login-to-gar@1f541877ceb22c7be7667d8a8df04984aeac9f9d # login-to-gar/v1.0.3
+        with:
+          environment: prod
+
+      - name: Extract image metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v6.1.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          # On tag pushes, semver + latest are produced automatically.
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/') }}
+            type=sha,prefix=main-,format=short,enable=${{ !startsWith(github.ref, 'refs/tags/') }}
+            type=raw,value=${{ inputs.tag }},enable=${{ inputs.tag != '' }}
+
+      - name: Build and push multi-arch image
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
+        with:
+          context: .
+          file: cmd/db-auth-gateway/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          provenance: true
+          sbom: true
+          build-args: |
+            VERSION=${{ inputs.tag != '' && inputs.tag || format('main-{0}', github.sha) }}
+            BRANCH=${{ github.ref_name }}
+            REVISION=${{ github.sha }}

@@ -1,0 +1,144 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'db-auth-gateway-v*'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+# Workflow-level default. The push-to-gar job opts up to id-token: write at
+# its own level. The org/repo default for GITHUB_TOKEN cannot be inferred
+# from the workspace, so set the floor here explicitly.
+permissions:
+  contents: read
+
+jobs:
+  mod-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Verify go.mod and go.sum
+        run: make mod-check
+
+  test:
+    runs-on: ubuntu-latest
+    needs: [mod-check]
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Run tests
+        run: make test
+
+  lint:
+    runs-on: ubuntu-latest
+    needs: [mod-check]
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Check formatting and lint
+        run: make check-fmt lint
+
+      - name: Check license headers
+        run: make check-license
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [mod-check]
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Build binary
+        run: make build
+
+      - name: Check CLI flag reference is up to date
+        run: make check-reference-help
+
+  test-e2e:
+    name: E2E tests
+    runs-on: ubuntu-latest
+    needs: [mod-check]
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      # make test-e2e builds the db-auth-gateway image and runs the tests against
+      # real backend containers (Mimir, Loki, Tempo) on the runner's Docker daemon.
+      # The LBAC enforcement tests are gated per backend:
+      #   - MIMIR_LBAC_ENABLED: on, because the default MIMIR_IMAGE is LBAC-capable.
+      #   - LOKI_LBAC_ENABLED: off, until LOKI_IMAGE points at an LBAC-capable build
+      #     (no public Loki image enforces LBAC yet).
+      - name: Run e2e tests
+        env:
+          MIMIR_LBAC_ENABLED: "true"
+          LOKI_LBAC_ENABLED: "false"
+        run: make test-e2e
+
+  push-to-gar:
+    name: Push image to GAR
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    needs: [build, test-e2e]
+    permissions:
+      contents: read
+      id-token: write # Required for OIDC workload identity used by login-to-gar
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Set image tag
+        id: tag
+        run: |
+          SHA=$(git rev-parse --short HEAD)
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=main-${SHA}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Login to GAR
+        uses: grafana/shared-workflows/actions/login-to-gar@1f541877ceb22c7be7667d8a8df04984aeac9f9d # login-to-gar/v1.0.3
+        with:
+          environment: prod
+
+      - name: Build and push multi-arch image to GAR
+        uses: grafana/shared-workflows/actions/push-to-gar-docker@524cae7d26b8ed09a35a1216e280371726bc5289 # push-to-gar-docker/v0.7.1
+        with:
+          push: "true"
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.tag.outputs.tag }}
+          file: cmd/db-auth-gateway/Dockerfile
+          image_name: db-auth-gateway
+          environment: prod
+          build-args: |
+            VERSION=${{ steps.tag.outputs.tag }}

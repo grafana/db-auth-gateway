@@ -1,0 +1,13 @@
+mimir_global:
+  block_reads: true
+  block_reads_message: "Down for really good reasons."
+  block_reads_http_response_code: 500
+  block_reads_http_retry_after: "30"
+
+  block_writes: true
+  block_writes_message: "Down for silly reasons."
+  block_writes_http_response_code: 502
+
+  block_ruler: true
+
+  block_aggregations: true

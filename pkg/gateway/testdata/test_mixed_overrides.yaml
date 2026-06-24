@@ -1,0 +1,7 @@
+mimir_global:
+  block_reads: true
+
+mimir:
+  1234:
+    block_writes: true
+    block_writes_http_response_code: 409

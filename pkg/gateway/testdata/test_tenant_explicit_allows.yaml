@@ -1,0 +1,17 @@
+mimir_global:
+  block_reads: true
+  block_writes: true
+  block_ruler: true
+
+mimir:
+  with_allow_all:
+    block_reads: false
+    block_writes: false
+    block_ruler: false
+  with_allow_reads:
+    block_reads: false
+  with_allow_writes:
+    block_writes: false
+  with_allow_ruler:
+    block_ruler: false
+  no_allows: {}

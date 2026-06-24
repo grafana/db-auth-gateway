@@ -1,0 +1,46 @@
+# Binary
+bin/db-auth-gateway
+
+# Build artifacts
+dist/
+.uptodate
+.pkg
+.cache
+
+# Go binaries and test artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Code coverage profiles and other test artifacts
+*.out
+coverage.*
+*.coverprofile
+profile.cov
+
+# Go workspace
+go.work
+go.work.sum
+
+# env file
+.env
+
+# Editor/IDE
+.idea
+*.iml
+.vscode
+
+# OS
+.DS_Store
+
+# Local Makefile overrides
+Makefile.local
+
+# Claude Code
+**/.claude/settings.local.json
+
