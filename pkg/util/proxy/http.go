@@ -104,7 +104,7 @@ func newHTTPProxy(name string, cfg Config, enableHTTP2 bool, logger log.Logger, 
 	// Check if we are testing, in which case we can disable certificate checking.
 	if strings.HasPrefix(cfg.URL, "https://127.0.0.1:") {
 		if transport.TLSClientConfig == nil {
-			transport.TLSClientConfig = &tls.Config{}
+			transport.TLSClientConfig = &tls.Config{MinVersion: tls.VersionTLS13}
 		}
 		transport.TLSClientConfig.InsecureSkipVerify = true
 	}
