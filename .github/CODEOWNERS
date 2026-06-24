@@ -1,0 +1,10 @@
+# Default owners for everything in the repo.
+* @grafana/mimir-maintainers @grafana/loki-team
+
+# Supply-chain-sensitive paths. Listed explicitly so a future, more-specific
+# rule does not silently override ownership (CODEOWNERS is "last match wins").
+/.github/                       @grafana/mimir-maintainers @grafana/loki-team
+/go.mod                         @grafana/mimir-maintainers @grafana/loki-team
+/go.sum                         @grafana/mimir-maintainers @grafana/loki-team
+/Makefile                       @grafana/mimir-maintainers @grafana/loki-team
+/cmd/db-auth-gateway/Dockerfile @grafana/mimir-maintainers @grafana/loki-team

@@ -1,0 +1,28 @@
+version: "2"
+
+linters:
+  default: standard  # enables errcheck, govet, ineffassign, staticcheck, unused, gosimple
+  enable:
+    - misspell       # catch typos in comments and strings
+    - revive         # general Go style (replacement for golint)
+  settings:
+    revive:
+      rules:
+        # Don't require doc comments on every exported symbol yet
+        - name: exported
+          disabled: true
+    errcheck:
+      # go-kit log.Logger.Log() returns an error that is universally ignored by convention
+      exclude-functions:
+        - (github.com/go-kit/log.Logger).Log
+
+formatters:
+  enable:
+    - goimports  # enforce import grouping/formatting
+
+issues:
+  exclude-rules:
+    # errcheck is noisy in tests — table-driven tests often ignore write errors
+    - path: _test\.go
+      linters:
+        - errcheck

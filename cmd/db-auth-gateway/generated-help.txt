@@ -1,0 +1,361 @@
+Usage of ./bin/db-auth-gateway:
+  -auth.type string
+    	Authentication type. Supported values: trust, forward_auth. When set to forward_auth, forward-auth.url is required (default "trust")
+  -backend string
+    	Determine if the backend is mimir, loki, pyroscope, or tempo (default "mimir")
+  -client-ip-middleware.enabled
+    	Flag used to enable the Client IP Middleware.
+  -client-ip-middleware.extractor-type value
+    	Specifies a comma-separated list of types of IP extractors to be used. Supported extractor types are "xff", "remoteaddr" and "xrealip".
+  -client-ip-middleware.trusted-proxy-count int
+    	Specifies the number of trusted proxies. The client IP will be the next to the left of the last trusted proxy IP. This has no impact if the "client-ip-middleware.extractor-type" is set to "remoteaddr" (default 2)
+  -debug.block-profile-rate int
+    	Fraction of goroutine blocking events that are reported in the blocking profile. 1 to include every blocking event in the profile, 0 to disable.
+  -debug.mutex-profile-fraction int
+    	Fraction at which mutex profile vents will be reported, 0 to disable
+  -enable-h2c
+    	Enable h2c.  This is required for HTTP2/GRPC without TLS.
+  -forward-auth.cache-ttl duration
+    	TTL for caching auth results (0 disables caching)
+  -forward-auth.timeout duration
+    	Timeout for requests to the external auth service (default 5s)
+  -forward-auth.url string
+    	URL of the external auth service (required when auth.type=forward_auth)
+  -gateway.client-cluster-validation.label string
+    	Primary cluster validation label.
+  -gateway.connection-ttl.idle-check-frequency duration
+    	The frequency of idle connections check. If during a check a connection is idle for at least -gateway.connection-ttl.max amount of time, its state is not kept anymore. Must be positive, and is taken into account only when -gateway.connection-ttl.max > 0. (default 1m0s)
+  -gateway.connection-ttl.max duration
+    	Maximum TTL of a TCP connection. When this limit is set, it will represent the maximum lifetime of TCP connections before the gateway sends a 'Connection: Close' response header to signal the client to close the connection. Set to <=0 to disable, or to at least -gateway.connection-ttl.min to enable.
+  -gateway.connection-ttl.min duration
+    	Minimum TTL of a TCP connection. When this limit is set, it will represent the minimum lifetime of TCP connections before the gateway sends a 'Connection: Close' response header to signal the client to close the connection. Set to <=0 to disable, or to at most -gateway.connection-ttl.max to enable.
+  -gateway.dial.timeout duration
+    	Timeout when dialing backend. This is the connection timeout. Set to 0 to disable. (default 5s)
+  -gateway.distributor.bufferpool-size int
+    	max number of byte buffers in the write buffer pool (default 100)
+  -gateway.distributor.bufferpool-width int
+    	capacity of byte array provided by the write buffer pool (default 1024)
+  -gateway.distributor.downstream-duration-route-method-enabled
+    	if enabled, the request_downstream_duration_seconds metric uses request route instead of request method as the method metrics label (applies to Mimir, Loki, and Pyroscope).
+  -gateway.distributor.endpoint string
+    	Distributor endpoint URL.
+  -gateway.distributor.healthcheck.enabled
+    	enable healthchecking for this endpoint
+  -gateway.distributor.healthcheck.interval duration
+    	how often to perform the healthcheck (default 30s)
+  -gateway.distributor.healthcheck.path string
+    	healthcheck path to call (default "/ready")
+  -gateway.distributor.healthcheck.port int
+    	port to use for healthcheck requests (0 = use endpoint URL port)
+  -gateway.distributor.healthcheck.retries int
+    	number of consecutive failures before marking unhealthy (default 2)
+  -gateway.distributor.healthcheck.timeout duration
+    	healthcheck request timeout (default 5s)
+  -gateway.distributor.http-keepalive-enabled
+    	HTTP keep-alive enabled on the downstream write path
+  -gateway.distributor.ignore-request-read-time-from-downstream-duration-enabled
+    	if enabled, the request_downstream_duration_seconds metric is adjusted to exclude the time spent reading upstream request (applies to Mimir, Loki, and Pyroscope)
+  -gateway.distributor.load-balancing
+    	enable HTTP load balancing for distributors discovered via DNS
+  -gateway.distributor.load-balancing-policy string
+    	the load balancing policy to use for distributors, only used if enabled. Supported values: round_robin, least_inflight. (default "least_inflight")
+  -gateway.distributor.mirror-targets value
+    	Targets to mirror distributor requests to (applies to Mimir, Loki, and Pyroscope HTTP write paths). Each target is a comma-separated URL optionally with a fraction query parameter (default is 1). Example values: http://mirror1:8080?fraction=0.5,http://mirror2:8080
+  -gateway.export.timeout duration
+    	Timeout for export requests to the backend, set to <=0 to disable (default 10m0s)
+  -gateway.grpc-client-cluster-validation.label string
+    	Primary cluster validation label.
+  -gateway.grpc-load-balancing-overloaded-factor float
+    	When the gRPC load balancing policy is set to "bounded_load", the balancer will attempt to not send to each backend a number of inflight requests higher than the average inflight requests across all backends multiplied by the overloaded factor. (default 2)
+  -gateway.grpc-load-balancing-policy string
+    	gRPC load balancing policy. Supported values: round_robin, bounded_load. (default "round_robin")
+  -gateway.grpc-max-recv-msg-size int
+    	gRPC max receive message size in bytes. (default 104857600)
+  -gateway.grpc-max-send-msg-size int
+    	gRPC max send message size in bytes. (default 2147483647)
+  -gateway.import.timeout duration
+    	Timeout for import requests to the backend, set to <=0 to disable (default 30m0s)
+  -gateway.max-bytes-write-limit int
+    	maximum number of bytes that the incoming write request can have in the request body
+  -gateway.metrics-namespace string
+    	Metrics namespace prefix. Defaults to the backend name if empty.
+  -gateway.query.endpoint string
+    	Query frontend endpoint URL.
+  -gateway.query.healthcheck.enabled
+    	enable healthchecking for this endpoint
+  -gateway.query.healthcheck.interval duration
+    	how often to perform the healthcheck (default 30s)
+  -gateway.query.healthcheck.path string
+    	healthcheck path to call (default "/ready")
+  -gateway.query.healthcheck.port int
+    	port to use for healthcheck requests (0 = use endpoint URL port)
+  -gateway.query.healthcheck.retries int
+    	number of consecutive failures before marking unhealthy (default 2)
+  -gateway.query.healthcheck.timeout duration
+    	healthcheck request timeout (default 5s)
+  -gateway.query.http-keepalive-enabled
+    	HTTP keep-alive enabled on the downstream query path (applies to Mimir, Loki, and Pyroscope)
+  -gateway.query.load-balancing
+    	enable HTTP load balancing for queriers discovered via DNS
+  -gateway.query.load-balancing-policy string
+    	the load balancing policy to use for queriers, only used if enabled. Supported values: round_robin, least_inflight. (default "least_inflight")
+  -gateway.read.timeout duration
+    	Timeout for read requests to the backend, set to <=0 to disable (default 2m0s)
+  -gateway.request-write-timeout-enabled
+    	This flag enables the use of HTTP write timeout middleware, than when the configured timeout is reached, the request context is cancelled. NOTE: This will break streaming responses, so if you need that, avoid enabling this flag.
+  -gateway.request.limit int
+    	Maximum number of gateway in-flight requests limit, set to <=0 to disable
+  -gateway.request.timeout duration
+    	A global timeout (inclusive of upstream requests, authentication, etc) for all incoming requests, set to <=0 to disable
+  -gateway.router.match-encoded-paths
+    	Enables or disables matching encoded paths in the http router. Matching encoded paths can have a noticeable CPU impact at high RPS (default true)
+  -gateway.ruler.endpoint string
+    	Ruler endpoint URL.
+  -gateway.ruler.healthcheck.enabled
+    	enable healthchecking for this endpoint
+  -gateway.ruler.healthcheck.interval duration
+    	how often to perform the healthcheck (default 30s)
+  -gateway.ruler.healthcheck.path string
+    	healthcheck path to call (default "/ready")
+  -gateway.ruler.healthcheck.port int
+    	port to use for healthcheck requests (0 = use endpoint URL port)
+  -gateway.ruler.healthcheck.retries int
+    	number of consecutive failures before marking unhealthy (default 2)
+  -gateway.ruler.healthcheck.timeout duration
+    	healthcheck request timeout (default 5s)
+  -gateway.write.timeout duration
+    	Timeout for write requests to the backend, set to <=0 to disable (default 15s)
+  -h
+    	Print help.
+  -help
+    	Print help.
+  -instrumentation.histogram-buckets string
+    	Set of buckets to be used for server, and downstream response time histograms
+  -instrumentation.server.port int
+    	port to use for hosting instrumentation endpoints (default 8001)
+  -instrumentation.server.read-timeout duration
+    	read timeout for the instrumentation endpoint (default 15s)
+  -log.format string
+    	Output log messages in the given format. Valid formats: [logfmt, json] (default "logfmt")
+  -log.level value
+    	Only log messages with the given severity or above. Valid levels: [debug, info, warn, error] (default info)
+  -loki.delete.endpoint string
+    	Loki delete endpoint to proxy delete requests to.
+  -loki.tail.endpoint string
+    	Loki tail endpoint to proxy WebSocket tail requests to.
+  -mem-ballast-size-mbs int
+    	Size of memory ballast to allocate in MBs.
+  -mimir.alertmanager.endpoint string
+    	Mimir alertmanager endpoint URL.
+  -mimir.alertmanager.healthcheck.enabled
+    	enable healthchecking for this endpoint
+  -mimir.alertmanager.healthcheck.interval duration
+    	how often to perform the healthcheck (default 30s)
+  -mimir.alertmanager.healthcheck.path string
+    	healthcheck path to call (default "/ready")
+  -mimir.alertmanager.healthcheck.port int
+    	port to use for healthcheck requests (0 = use endpoint URL port)
+  -mimir.alertmanager.healthcheck.retries int
+    	number of consecutive failures before marking unhealthy (default 2)
+  -mimir.alertmanager.healthcheck.timeout duration
+    	healthcheck request timeout (default 5s)
+  -mimir.compactor.endpoint string
+    	Mimir compactor endpoint URL.
+  -mimir.compactor.healthcheck.enabled
+    	enable healthchecking for this endpoint
+  -mimir.compactor.healthcheck.interval duration
+    	how often to perform the healthcheck (default 30s)
+  -mimir.compactor.healthcheck.path string
+    	healthcheck path to call (default "/ready")
+  -mimir.compactor.healthcheck.port int
+    	port to use for healthcheck requests (0 = use endpoint URL port)
+  -mimir.compactor.healthcheck.retries int
+    	number of consecutive failures before marking unhealthy (default 2)
+  -mimir.compactor.healthcheck.timeout duration
+    	healthcheck request timeout (default 5s)
+  -mimir.inputs.enable-thirdparty
+    	whether to enable 3rd party write endpoints (Influx, OpenTSDB)
+  -mimir.write.drop-requests-with-skip-label-validation-header.enabled
+    	whether drop incoming write requests with the X-Mimir-SkipLabelNameValidation header, requests will be dropped by default (default true)
+  -overrides-path string
+    	Comma separated paths to files that contains runtime reloadable per-tenant overrides config.
+  -overrides-reload-period duration
+    	Duration to use as the reload period for the runtime reloadable per-tenant overrides. (default 15s)
+  -pyroscope.debug-info-upload.timeout duration
+    	Timeout for Pyroscope debug info upload requests, set to <=0 to disable (default 2m0s)
+  -readiness.server.enabled
+    	enable a separate dedicated readiness endpoint
+  -readiness.server.port int
+    	port to use for hosting the readiness endpoint (default 8002)
+  -readiness.server.read-timeout duration
+    	read timeout for the readiness endpoint (default 15s)
+  -sensitive-header-removal-middleware.enabled
+    	Enable removing sensitive HTTP headers from proxied requests. (default true)
+  -sensitive-header-removal-middleware.extra-headers comma-separated-list-of-strings
+    	Additional headers to remove from proxied requests.
+  -server.cluster-validation.additional-labels comma-separated-list-of-strings
+    	Comma-separated list of additional cluster validation labels that the server will accept from incoming requests.
+  -server.cluster-validation.grpc.enabled
+    	When enabled, cluster label validation is executed: configured cluster validation label is compared with the cluster validation label received through the requests.
+  -server.cluster-validation.grpc.soft-validation
+    	When enabled, soft cluster label validation is executed. Can be enabled only together with server.cluster-validation.grpc.enabled
+  -server.cluster-validation.http.enabled
+    	When enabled, cluster label validation is executed: configured cluster validation label is compared with the cluster validation label received through the requests.
+  -server.cluster-validation.http.excluded-paths comma-separated-list-of-strings
+    	Comma-separated list of url paths that are excluded from the cluster validation check.
+  -server.cluster-validation.http.excluded-user-agents comma-separated-list-of-strings
+    	Comma-separated list of user agents that are excluded from the cluster validation check.
+  -server.cluster-validation.http.soft-validation
+    	When enabled, soft cluster label validation is executed. Can be enabled only together with server.cluster-validation.http.enabled
+  -server.cluster-validation.label string
+    	Primary cluster validation label.
+  -server.create-new-traces
+    	Creates new traces for each call rather than continuing the existing trace. A span link is used to allow navigation to the parent trace. Only works when using Open-Telemetry tracing.
+  -server.graceful-shutdown-timeout duration
+    	Timeout for graceful shutdowns (default 30s)
+  -server.grpc-collect-max-streams-by-conn
+    	If true, the max streams by connection gauge will be collected. (default true)
+  -server.grpc-conn-limit int
+    	Maximum number of simultaneous grpc connections, <=0 to disable
+  -server.grpc-listen-address string
+    	gRPC server listen address.
+  -server.grpc-listen-network string
+    	gRPC server listen network (default "tcp")
+  -server.grpc-listen-port int
+    	gRPC server listen port. (default 9095)
+  -server.grpc-max-concurrent-streams uint
+    	Limit on the number of concurrent streams for gRPC calls per client connection (0 = unlimited) (default 100)
+  -server.grpc-max-recv-msg-size-bytes int
+    	Limit on the size of a gRPC message this server can receive (bytes). (default 4194304)
+  -server.grpc-max-send-msg-size-bytes int
+    	Limit on the size of a gRPC message this server can send (bytes). (default 4194304)
+  -server.grpc-tls-ca-path string
+    	GRPC TLS Client CA path.
+  -server.grpc-tls-cert-path string
+    	GRPC TLS server cert path.
+  -server.grpc-tls-client-auth string
+    	GRPC TLS Client Auth type.
+  -server.grpc-tls-key-path string
+    	GRPC TLS server key path.
+  -server.grpc.keepalive.max-connection-age duration
+    	The duration for the maximum amount of time a connection may exist before it will be closed. Default: infinity (default 2562047h47m16.854775807s)
+  -server.grpc.keepalive.max-connection-age-grace duration
+    	An additive period after max-connection-age after which the connection will be forcibly closed. Default: infinity (default 2562047h47m16.854775807s)
+  -server.grpc.keepalive.max-connection-idle duration
+    	The duration after which an idle connection should be closed. Default: infinity (default 2562047h47m16.854775807s)
+  -server.grpc.keepalive.min-time-between-pings duration
+    	Minimum amount of time a client should wait before sending a keepalive ping. If client sends keepalive ping more often, server will send GOAWAY and close the connection. (default 5m0s)
+  -server.grpc.keepalive.ping-without-stream-allowed
+    	If true, server allows keepalive pings even when there are no active streams(RPCs). If false, and client sends ping when there are no active streams, server will send GOAWAY and close the connection.
+  -server.grpc.keepalive.time duration
+    	Duration after which a keepalive probe is sent in case of no activity over the connection., Default: 2h (default 2h0m0s)
+  -server.grpc.keepalive.timeout duration
+    	After having pinged for keepalive check, the duration after which an idle connection should be closed, Default: 20s (default 20s)
+  -server.grpc.num-workers int
+    	If non-zero, configures the amount of GRPC server workers used to serve the requests.
+  -server.grpc.read-buffer-size-bytes int
+    	Size of the read buffer for each gRPC connection (bytes). A smaller buffer may reduce memory usage but may lead to more system calls. (default 32768)
+  -server.grpc.write-buffer-size-bytes int
+    	Size of the write buffer for each gRPC connection (bytes). A smaller buffer may reduce memory usage but may lead to more system calls. (default 32768)
+  -server.http-conn-limit int
+    	Maximum number of simultaneous http connections, <=0 to disable
+  -server.http-idle-timeout duration
+    	Idle timeout for HTTP server (default 2m0s)
+  -server.http-listen-address string
+    	HTTP server listen address.
+  -server.http-listen-network string
+    	HTTP server listen network, default tcp (default "tcp")
+  -server.http-listen-port int
+    	HTTP server listen port. (default 80)
+  -server.http-log-closed-connections-without-response-enabled
+    	Log closed connections that did not receive any response, most likely because client didn't send any request within timeout.
+  -server.http-read-header-timeout duration
+    	Read timeout for HTTP request headers. If set to 0, value of -server.http-read-timeout is used.
+  -server.http-read-timeout duration
+    	Read timeout for entire HTTP request, including headers and body. (default 30s)
+  -server.http-tls-ca-path string
+    	HTTP TLS Client CA path.
+  -server.http-tls-cert-path string
+    	HTTP server cert path.
+  -server.http-tls-client-auth string
+    	HTTP TLS Client Auth type.
+  -server.http-tls-key-path string
+    	HTTP server key path.
+  -server.http-write-timeout duration
+    	Write timeout for HTTP server (default 30s)
+  -server.log-request-at-info-level-enabled
+    	Optionally log requests at info level instead of debug level. Applies to request headers as well if server.log-request-headers is enabled.
+  -server.log-request-headers
+    	Optionally log request headers.
+  -server.log-request-headers-exclude-list string
+    	Comma separated list of headers to exclude from loggin. Only used if server.log-request-headers is true.
+  -server.log-source-ips-enabled
+    	Optionally log the source IPs.
+  -server.log-source-ips-full
+    	Log all source IPs instead of only the originating one. Only used if server.log-source-ips-enabled is true
+  -server.log-source-ips-header string
+    	Header field storing the source IPs. Only used if server.log-source-ips-enabled is true. If not set the default Forwarded, X-Real-IP and X-Forwarded-For headers are used
+  -server.log-source-ips-regex string
+    	Regex for matching the source IPs. Only used if server.log-source-ips-enabled is true. If not set the default Forwarded, X-Real-IP and X-Forwarded-For headers are used
+  -server.path-prefix string
+    	Base path to serve all API routes from (e.g. /v1/)
+  -server.proxy-protocol-enabled
+    	Enables PROXY protocol.
+  -server.register-instrumentation
+    	Register the intrumentation handlers (/metrics etc). (default true)
+  -server.report-grpc-codes-in-instrumentation-label-enabled
+    	If set to true, gRPC statuses will be reported in instrumentation labels with their string representations. Otherwise, they will be reported as "error".
+  -server.throughput.latency-cutoff duration
+    	Requests taking over the cutoff are be observed to measure throughput. Server-Timing header is used with specified unit as the indicator, for example 'Server-Timing: unit;val=8.2'. If set to 0, the throughput is not calculated.
+  -server.throughput.unit string
+    	Unit of the server throughput metric, for example 'processed_bytes' or 'samples_processed'. Observed values are gathered from the 'Server-Timing' header with the 'val' key. If set, it is appended to the request_server_throughput metric name. (default "samples_processed")
+  -server.tls-cipher-suites string
+    	Comma-separated list of cipher suites to use. If blank, the default Go cipher suites is used.
+  -server.tls-min-version string
+    	Minimum TLS version to use. Allowed values: VersionTLS10, VersionTLS11, VersionTLS12, VersionTLS13. If blank, the Go TLS minimum version is used.
+  -server.trace-request-headers
+    	Optionally add request headers to tracing spans.
+  -server.trace-request-headers-exclude-list string
+    	Comma separated list of headers to exclude from tracing spans. Only used if server.trace-request-headers is true. The following headers are always excluded: Authorization, Cookie, X-Access-Token, X-Csrf-Token, X-Grafana-Id.
+  -shutdown-delay duration
+    	How long to wait between SIGTERM and shutdown. After receiving SIGTERM, proxy will report not-ready status via readiness handler.
+  -tempo.distributor.endpoint string
+    	tempo distributor endpoint to proxy GRPC write requests to
+  -tempo.distributor.healthcheck.enabled
+    	enable healthchecking for this endpoint
+  -tempo.distributor.healthcheck.interval duration
+    	how often to perform the healthcheck (default 30s)
+  -tempo.distributor.healthcheck.path string
+    	healthcheck path to call (default "/ready")
+  -tempo.distributor.healthcheck.port int
+    	port to use for healthcheck requests (0 = use endpoint URL port)
+  -tempo.distributor.healthcheck.retries int
+    	number of consecutive failures before marking unhealthy (default 2)
+  -tempo.distributor.healthcheck.timeout duration
+    	healthcheck request timeout (default 5s)
+  -tempo.distributor.http-endpoint string
+    	tempo distributor endpoint to proxy HTTP write requests to
+  -tempo.distributor.load-balancing
+    	enable HTTP load balancing for tempo distributors discovered via DNS
+  -tempo.distributor.load-balancing-policy string
+    	the load balancing policy to use for tempo distributors, only used if enabled. Supported values: round_robin, least_inflight. (default "least_inflight")
+  -tempo.overrides.api-enabled
+    	Enable the Tempo user-configurable overrides API. When disabled, the /tempo/api/overrides routes are not registered. (default true)
+  -tempo.query.endpoint string
+    	tempo query endpoint to proxy requests to
+  -tempo.query.healthcheck.enabled
+    	enable healthchecking for this endpoint
+  -tempo.query.healthcheck.interval duration
+    	how often to perform the healthcheck (default 30s)
+  -tempo.query.healthcheck.path string
+    	healthcheck path to call (default "/ready")
+  -tempo.query.healthcheck.port int
+    	port to use for healthcheck requests (0 = use endpoint URL port)
+  -tempo.query.healthcheck.retries int
+    	number of consecutive failures before marking unhealthy (default 2)
+  -tempo.query.healthcheck.timeout duration
+    	healthcheck request timeout (default 5s)
+  -tempo.streaming-query.endpoint string
+    	tempo streaming query endpoint to proxy GRPC read requests to
+  -x-forwarded-for-middleware.enabled
+    	Ensures if an existing X-Forwarded-For header is not present the value from that middleware is used.

@@ -1,0 +1,20 @@
+repos:
+  - repo: local
+    hooks:
+      - id: go-fmt
+        name: go fmt
+        language: system
+        entry: gofmt -w
+        types: [go]
+
+      - id: go-vet
+        name: go vet
+        language: system
+        entry: bash -c 'go vet ./...'
+        types: [go]
+        pass_filenames: false
+
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v2.11.3
+    hooks:
+      - id: golangci-lint

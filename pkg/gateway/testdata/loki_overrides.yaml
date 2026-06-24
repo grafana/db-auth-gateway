@@ -1,0 +1,15 @@
+loki:
+  "1234":
+    "block_queries": true
+  "1235":
+    "log_volume_histogram":
+      enabled: false            # Should drop all log volume histogram queries for this tenant.
+  "1236":
+    "log_volume_histogram":
+      timeout: 100ms            # Should have custom timeout for log volume histogram queries
+  9999:
+    block_writes: true
+
+  "1111":
+    "block_hint_queries":
+      enabled: true
