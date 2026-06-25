@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     tags:
-      - 'db-auth-gateway-v*'
+      - 'v*'
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -128,8 +128,6 @@ jobs:
 
       - name: Login to GAR
         uses: grafana/shared-workflows/actions/login-to-gar@1f541877ceb22c7be7667d8a8df04984aeac9f9d # login-to-gar/v1.0.3
-        with:
-          environment: prod
 
       - name: Build and push multi-arch image to GAR
         uses: grafana/shared-workflows/actions/push-to-gar-docker@524cae7d26b8ed09a35a1216e280371726bc5289 # push-to-gar-docker/v0.7.1
