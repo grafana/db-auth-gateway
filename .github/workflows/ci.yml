@@ -108,7 +108,7 @@ jobs:
   push-to-gar:
     name: Push image to GAR
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [build, test-e2e]
     permissions:
       contents: read
@@ -120,11 +120,7 @@ jobs:
         id: tag
         run: |
           SHA=$(git rev-parse --short HEAD)
-          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          else
-            echo "tag=main-${SHA}" >> $GITHUB_OUTPUT
-          fi
+          echo "tag=main-${SHA}" >> $GITHUB_OUTPUT
 
       - name: Login to GAR
         uses: grafana/shared-workflows/actions/login-to-gar@1f541877ceb22c7be7667d8a8df04984aeac9f9d # login-to-gar/v1.0.3
