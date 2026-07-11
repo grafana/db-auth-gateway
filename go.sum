@@ -392,8 +392,8 @@ github.com/uber/jaeger-lib v2.4.1+incompatible h1:td4jdvLcExb4cBISKIpHuGoVXh+dVK
 github.com/uber/jaeger-lib v2.4.1+incompatible/go.mod h1:ComeNDZlWwrWnDv8aPp0Ba6+uUTzImX/AauajbLI56U=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
-go.etcd.io/etcd/api/v3 v3.6.9 h1:UA7iKfEW1AzgihcBSGXci2kDGQiokSq41F9HMCI/RTI=
-go.etcd.io/etcd/api/v3 v3.6.9/go.mod h1:csEk/qTfxKL36NqJdU15Tgtl65A8dyEY2BYo7PRsIwk=
+go.etcd.io/etcd/api/v3 v3.7.0 h1:WZlGK7pRtYGDB8ti8wkrQ5D2oWGMbtNL9VA5e+vF2Fg=
+go.etcd.io/etcd/api/v3 v3.7.0/go.mod h1:EcTihnwAQ0BQNh5dfAdaFVFdchuo7EP0HlX7TV3jz/A=
 go.etcd.io/etcd/client/pkg/v3 v3.6.9 h1:T8nuk8Lz64C+Hzb0coBFLMSlVSQZBpAtFk46swdM1DA=
 go.etcd.io/etcd/client/pkg/v3 v3.6.9/go.mod h1:WEy3PpwbbEBVRdh1NVJYsuUe/8eyI21PNJRazeD8z/Y=
 go.etcd.io/etcd/client/v3 v3.6.9 h1:3X555hQXmhRr27O37wls53g68CpUiPOiHXrZfz2Al+o=
