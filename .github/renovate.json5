@@ -1,0 +1,40 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+
+  // Grafana's self-hosted Renovate already applies the shared presets (base,
+  // docker, github-actions, helm, labels, rate-limits, shared-workflows, yarn,
+  // npm, plugin-ci-workflows) plus forced security settings to every repo via
+  // the org-wide onboarding config, so they don't need repeating here:
+  //   https://github.com/grafana/deployment_tools/blob/master/ksonnet/lib/renovate-self-hosted/renovate-base.libsonnet
+  //
+  // automerge is the one shared preset that is NOT applied globally, so we opt
+  // in here: patch/pin/digest updates and Go patch updates merge automatically
+  // once CI passes.
+  extends: [
+    "github>grafana/grafana-renovate-config//presets/automerge",
+  ],
+
+  // The go directive in go.mod uses go-mod-directive versioning, which Renovate
+  // treats as a minimum constraint and never bumps on its own. Switch it to
+  // rangeStrategy "bump" so Renovate tracks new Go releases (patch bumps
+  // auto-merge via the automerge preset; a minor bump needs manual approval).
+  packageRules: [
+    {
+      matchDatasources: ["golang-version"],
+      rangeStrategy: "bump",
+    },
+  ],
+
+  // The org-wide custom manager that reads "# renovate:" annotations only scans
+  // workflows, action.yml, Dockerfiles and scripts/**/*.sh — not the Makefile —
+  // so the annotated image/tool versions pinned there go undetected. Scan it here.
+  customManagers: [
+    {
+      customType: "regex",
+      managerFilePatterns: ["/(^|/)Makefile$/"],
+      matchStrings: [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+?)(?: versioning=(?<versioning>\\S+?))?\\s+[A-Za-z0-9_]+\\s*\\??=\\s*(?:\\S+:)?(?<currentValue>[^\\s@:\"']+)",
+      ],
+    },
+  ],
+}

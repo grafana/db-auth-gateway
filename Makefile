@@ -3,7 +3,6 @@
 
 SHELL = /usr/bin/env bash -o pipefail
 
-GO_VERSION  ?= 1.26.1
 GIT_REVISION := $(shell git rev-parse --short HEAD)
 GIT_BRANCH   := $(shell git rev-parse --abbrev-ref HEAD)
 GO_FLAGS     := -ldflags "-s -w \
@@ -12,6 +11,7 @@ GO_FLAGS     := -ldflags "-s -w \
     -X main.Revision=$(GIT_REVISION)"
 
 IMAGE_PREFIX          ?= grafana/db-auth-gateway
+# renovate: datasource=github-releases depName=golangci/golangci-lint
 GOLANGCI_LINT_VERSION ?= v2.11.3
 
 DB_AUTH_GATEWAY_IMAGE ?= $(IMAGE_PREFIX):$(GIT_REVISION)
