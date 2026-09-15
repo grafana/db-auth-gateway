@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"slices"
 	"testing"
 	"time"
@@ -59,6 +60,22 @@ func TestMimirOverridesMiddleware_GlobalSettings(t *testing.T) {
 			assert.Equal(t, tc.expectedRetryAfter, resp.Header().Get(httpRetryAfter))
 		})
 	}
+}
+
+func TestMimirOverridesMiddleware_WrapReusesMatchers(t *testing.T) {
+	mo := NewMimirOverridesMiddleware(nil)
+	queryRoutes := mo.queryRoutes
+	writeRoutes := mo.writeRoutes
+	rulerRoutes := mo.rulerRoutes
+	aggregationRoutes := mo.aggregationRoutes
+
+	mo.Wrap(&mockHandler{})
+	mo.Wrap(&mockHandler{})
+
+	assert.Same(t, queryRoutes, mo.queryRoutes)
+	assert.Same(t, writeRoutes, mo.writeRoutes)
+	assert.Same(t, rulerRoutes, mo.rulerRoutes)
+	assert.Same(t, aggregationRoutes, mo.aggregationRoutes)
 }
 
 func TestMimirOverridesMiddleware_PerTenantSettings(t *testing.T) {
@@ -474,6 +491,18 @@ func TestLokiOverridesMiddleware(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestLokiOverridesMiddleware_WrapReusesMatchers(t *testing.T) {
+	lom := NewLokiOverridesMiddleware(nil)
+	queryRoutes := reflect.ValueOf(lom.queryRoutes).Pointer()
+	writeRoutes := reflect.ValueOf(lom.writeRoutes).Pointer()
+
+	lom.Wrap(&mockHandler{})
+	lom.Wrap(&mockHandler{})
+
+	assert.Equal(t, queryRoutes, reflect.ValueOf(lom.queryRoutes).Pointer())
+	assert.Equal(t, writeRoutes, reflect.ValueOf(lom.writeRoutes).Pointer())
 }
 
 type mockHandler struct{}
