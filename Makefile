@@ -24,7 +24,7 @@ LOKI_IMAGE  ?= grafana/loki:3.7.1
 # release. The whole e2e suite runs against this image.
 MIMIR_IMAGE ?= grafana/mimir:r400-c18b9d72
 # renovate: datasource=docker depName=grafana/tempo
-TEMPO_IMAGE ?= grafana/tempo:2.10.3
+TEMPO_IMAGE ?= grafana/tempo:2.10.8
 
 .PHONY: all build test test-race test-e2e lint fmt check-fmt check mod-check tidy install-hooks docker-build clean help check-license reference-help check-reference-help
 
