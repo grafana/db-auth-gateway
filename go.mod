@@ -140,4 +140,4 @@ require (
 
 replace github.com/hashicorp/memberlist => github.com/grafana/memberlist v0.3.1-0.20260515134459-1798cf41aca7
 
-replace github.com/opentracing-contrib/go-grpc => github.com/charleskorn/go-grpc v0.0.0-20231024023642-e9298576254f
+replace github.com/opentracing-contrib/go-grpc => github.com/charleskorn/go-grpc v0.0.0-20210225150812-73cb765af46e
