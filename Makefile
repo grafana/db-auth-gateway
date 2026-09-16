@@ -16,7 +16,7 @@ GOLANGCI_LINT_VERSION ?= v2.11.3
 
 DB_AUTH_GATEWAY_IMAGE ?= $(IMAGE_PREFIX):$(GIT_REVISION)
 # renovate: datasource=docker depName=grafana/loki
-LOKI_IMAGE  ?= grafana/loki:3.7.1
+LOKI_IMAGE  ?= grafana/loki:3.7.7
 # LBAC-capable Mimir build. LBAC (the -auth.label-access-control-enabled flag and
 # X-Prom-Label-Policy enforcement) is not in any stable Mimir release yet, so we pin a
 # weekly r400 image that contains it (grafana/mimir#15554). Revert to a stable
