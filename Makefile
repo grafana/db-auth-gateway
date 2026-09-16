@@ -12,7 +12,7 @@ GO_FLAGS     := -ldflags "-s -w \
 
 IMAGE_PREFIX          ?= grafana/db-auth-gateway
 # renovate: datasource=github-releases depName=golangci/golangci-lint
-GOLANGCI_LINT_VERSION ?= v2.11.3
+GOLANGCI_LINT_VERSION ?= v2.13.2
 
 DB_AUTH_GATEWAY_IMAGE ?= $(IMAGE_PREFIX):$(GIT_REVISION)
 # renovate: datasource=docker depName=grafana/loki
