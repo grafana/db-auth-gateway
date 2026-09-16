@@ -171,18 +171,15 @@ func sanitizeHTTPRetryAfter(rawHTTPRetryAfter string) (string, error) {
 }
 
 type MimirOverridesMiddleware struct {
-	cfg *RuntimeConfigTenantOverrides
+	cfg               *RuntimeConfigTenantOverrides
+	queryRoutes       *routesMatcher
+	writeRoutes       *routesMatcher
+	rulerRoutes       *routesMatcher
+	aggregationRoutes *routesMatcher
 }
 
 // NewMimirOverridesMiddleware creates a new mimir overrides middleware
 func NewMimirOverridesMiddleware(cfg *RuntimeConfigTenantOverrides) *MimirOverridesMiddleware {
-	return &MimirOverridesMiddleware{
-		cfg: cfg,
-	}
-}
-
-// Wrap returns the Mimir overrides middleware function
-func (l MimirOverridesMiddleware) Wrap(next http.Handler) http.Handler {
 	queryRoutes := newRoutesMatcher()
 	queryRoutes.addRoutes(router.MimirQueryRoutes)
 
@@ -196,9 +193,17 @@ func (l MimirOverridesMiddleware) Wrap(next http.Handler) http.Handler {
 	aggregationRoutes := newRoutesMatcher()
 	// AggregationsRoutes (adaptive metrics) is an enterprise-only feature and has no OSS equivalent.
 
-	configRoutes := newRoutesMatcher()
-	_ = configRoutes
+	return &MimirOverridesMiddleware{
+		cfg:               cfg,
+		queryRoutes:       queryRoutes,
+		writeRoutes:       writeRoutes,
+		rulerRoutes:       rulerRoutes,
+		aggregationRoutes: aggregationRoutes,
+	}
+}
 
+// Wrap returns the Mimir overrides middleware function
+func (l MimirOverridesMiddleware) Wrap(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		global, perTenant := l.getMimirOverridesForTenant(r)
@@ -210,10 +215,10 @@ func (l MimirOverridesMiddleware) Wrap(next http.Handler) http.Handler {
 			routes             *routesMatcher
 			blocker            func(context.Context, http.ResponseWriter, mimirOverrides)
 		}{
-			{global.BlockReads, perTenant.BlockReads, queryRoutes, blockReads},
-			{global.BlockWrites, perTenant.BlockWrites, writeRoutes, blockWrites},
-			{global.BlockRuler, perTenant.BlockRuler, rulerRoutes, blockRuler},
-			{global.BlockAggregations, perTenant.BlockAggregations, aggregationRoutes, blockAggregations},
+			{global.BlockReads, perTenant.BlockReads, l.queryRoutes, blockReads},
+			{global.BlockWrites, perTenant.BlockWrites, l.writeRoutes, blockWrites},
+			{global.BlockRuler, perTenant.BlockRuler, l.rulerRoutes, blockRuler},
+			{global.BlockAggregations, perTenant.BlockAggregations, l.aggregationRoutes, blockAggregations},
 		} {
 			if route.tenantBlockSetting != nil {
 				// If the tenant has an override, use it

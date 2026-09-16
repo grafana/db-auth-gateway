@@ -101,13 +101,17 @@ func (l *LokiOverrides) UnmarshalYAML(value *yaml.Node) error {
 }
 
 type LokiOverridesMiddleware struct {
-	cfg *RuntimeConfigTenantOverrides
+	cfg         *RuntimeConfigTenantOverrides
+	queryRoutes map[string]bool
+	writeRoutes map[string]bool
 }
 
 // NewLokiOverridesMiddleware creates a new loki overrides middleware
 func NewLokiOverridesMiddleware(cfg *RuntimeConfigTenantOverrides) *LokiOverridesMiddleware {
 	return &LokiOverridesMiddleware{
-		cfg: cfg,
+		cfg:         cfg,
+		queryRoutes: buildRoutesMap(router.LokiQueryRoutes),
+		writeRoutes: buildRoutesMap(router.LokiWriteRoutes),
 	}
 }
 
@@ -121,14 +125,11 @@ func (l LokiOverridesMiddleware) getLokiOverridesFromRequest(r *http.Request) Lo
 
 // Wrap returns the loki overrides middleware function
 func (l LokiOverridesMiddleware) Wrap(next http.Handler) http.Handler {
-	queryRoutes := buildRoutesMap(router.LokiQueryRoutes)
-	writeRoutes := buildRoutesMap(router.LokiWriteRoutes)
-
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
 		switch {
-		case queryRoutes[r.URL.Path]:
+		case l.queryRoutes[r.URL.Path]:
 			o := l.getLokiOverridesFromRequest(r)
 			if o.BlockQueries {
 				// Query is blocked for this tenant ID
@@ -166,7 +167,7 @@ func (l LokiOverridesMiddleware) Wrap(next http.Handler) http.Handler {
 				defer cancel()
 				r = r.WithContext(ctx)
 			}
-		case writeRoutes[r.URL.Path]:
+		case l.writeRoutes[r.URL.Path]:
 			o := l.getLokiOverridesFromRequest(r)
 			if o.BlockWrites {
 				// Writes is blocked for this tenant ID
