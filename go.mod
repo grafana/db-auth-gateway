@@ -1,6 +1,6 @@
 module github.com/grafana/db-auth-gateway
 
-go 1.26.1
+go 1.26.10
 
 require (
 	github.com/felixge/httpsnoop v1.1.0
