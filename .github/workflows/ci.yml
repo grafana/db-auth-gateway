@@ -123,7 +123,7 @@ jobs:
           echo "tag=main-${SHA}" >> $GITHUB_OUTPUT
 
       - name: Login to GAR
-        uses: grafana/shared-workflows/actions/login-to-gar@1f541877ceb22c7be7667d8a8df04984aeac9f9d # login-to-gar/v1.0.3
+        uses: grafana/shared-workflows/actions/login-to-gar@afad5c7621e788905e6417f05b492972685ab1eb # login-to-gar/v1.0.4
 
       - name: Build and push multi-arch image to GAR
         uses: grafana/shared-workflows/actions/push-to-gar-docker@524cae7d26b8ed09a35a1216e280371726bc5289 # push-to-gar-docker/v0.7.1
