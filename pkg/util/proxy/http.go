@@ -27,13 +27,12 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/trace"
-	"golang.org/x/net/http2"
 
 	"github.com/grafana/db-auth-gateway/pkg/util/proxy/dnslb"
 )
 
 type h2cTransportWrapper struct {
-	*http2.Transport
+	*http.Transport
 }
 
 func (t *h2cTransportWrapper) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -110,19 +109,19 @@ func newHTTPProxy(name string, cfg Config, enableHTTP2 bool, logger log.Logger, 
 	}
 
 	if enableHTTP2 {
+		// Cleartext HTTP/2 with prior knowledge. The transport only takes that
+		// path for http:// URLs when HTTP1 is absent from the protocol set.
+		h2cProtocols := &http.Protocols{}
+		h2cProtocols.SetUnencryptedHTTP2(true)
+
 		transport.RegisterProtocol("h2c", &h2cTransportWrapper{
-			Transport: &http2.Transport{
-				DialTLS: func(netw, addr string, _ *tls.Config) (net.Conn, error) {
-					return net.Dial(netw, addr)
-				},
-				AllowHTTP: true,
-			},
+			Transport: &http.Transport{Protocols: h2cProtocols},
 		})
 
-		err := http2.ConfigureTransport(transport.Transport)
-		if err != nil {
-			return nil, fmt.Errorf("failed to configure http2 transport: %w", err)
-		}
+		protocols := &http.Protocols{}
+		protocols.SetHTTP1(true)
+		protocols.SetHTTP2(true)
+		transport.Protocols = protocols
 	}
 
 	errorHandler := NewErrorHandler(logger, pm)
