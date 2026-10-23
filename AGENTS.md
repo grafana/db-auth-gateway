@@ -20,6 +20,17 @@ the handful of traps that cost someone an afternoon. Add to it as you find more.
 install-hooks` wires up the `pre-commit` hooks (`gofmt`, `go vet`,
 `golangci-lint`).
 
+**`make lint` needs a toolchain matching `go.mod`.** CI resolves Go via
+`go-version-file: go.mod`, and the pinned `golangci-lint` cannot read export
+data from a newer toolchain. On a Go 1.27 toolchain it fails with
+`typecheck` errors in files you never touched —
+`export data version 5 is greater than maximum supported version 2`. That looks
+exactly like a real failure and is not. Run it as:
+
+```sh
+GOTOOLCHAIN=go1.26.10 make lint   # whatever go.mod currently declares
+```
+
 Two checks fail on generated output drifting rather than on bad code:
 
 - `make check-license` — every Go file needs its SPDX header.
@@ -90,6 +101,50 @@ Consequences worth knowing:
   It only checks the schema. It will happily pass a `matchPackageNames` pattern
   that matches nothing, so test the pattern against real module names too.
 
+## Doing a pass over the Renovate PRs
+
+These pile up fast. Triage is mechanical once you know the shape of it.
+
+Survey everything in one go — what matters is the failing and pending checks,
+not the titles:
+
+```sh
+for n in $(gh pr list --limit 100 --json number,author \
+    --jq '.[] | select(.author.login | test("renovate")) | .number' | sort -n); do
+  gh pr view "$n" --json number,title,reviewDecision,mergeStateStatus,statusCheckRollup \
+    --jq '"\(.number)\t\(.mergeStateStatus)\t\(.reviewDecision)\tFAIL=\([.statusCheckRollup[]|select(.conclusion=="FAILURE" or .state=="FAILURE")|(.name // .context)]|join(","))\tPEND=\([.statusCheckRollup[]|select(.status=="IN_PROGRESS" or .status=="QUEUED" or .state=="PENDING")|(.name // .context)]|join(","))\t\(.title)"'
+done
+```
+
+Then sort them into four piles:
+
+- **Green and non-major** — the mergeable batch. Check the `update-minor`,
+  `automerge-patch` and `update-major` labels Renovate applies rather than
+  reading version numbers out of titles.
+- **`PEND=renovate/stability-days`** — leave alone. That is the minimum
+  release age holding the PR deliberately; it is not a broken check.
+- **`update-major`** — needs a human decision, not a batch merge.
+- **Red** — check it against the dependency traps below before reading the
+  diff. Most red Renovate PRs here are failing for a reason that has nothing
+  to do with their own change.
+
+Merging the green pile:
+
+1. Approve, and un-request the surplus code-owner team (see the payload above).
+   Approving a patch/pin/digest PR *is* effectively merging it — the
+   `automerge` preset lands it as soon as CI is green, so expect some to
+   disappear before you get to them.
+2. Merge them **one at a time**. Every merge sends the other PRs'
+   `mergeStateStatus` to `UNKNOWN` for 10-30s while GitHub recomputes, and a
+   merge attempt during that window fails. Wait for each to settle.
+3. Expect conflicts as you go: sibling PRs touching adjacent `go.mod`,
+   `go.sum` or `Dockerfile` lines go `DIRTY` once one of them lands. Skip
+   those and let Renovate rebase them — and remember the rebase dismisses the
+   approval, so they need approving again next pass.
+4. Let CI go green on `main` between batches rather than at the end. Each PR's
+   CI only ever proved that change against the *old* `main`, never against its
+   siblings.
+
 ## Dependency traps
 
 Recurring failures that are not the PR's fault:
@@ -106,8 +161,15 @@ Recurring failures that are not the PR's fault:
 - **The OpenTelemetry modules must move together.** v1.x stable and v0.x
   log-signal modules ship from the same release (v1.45.0 pairs with v0.21.0);
   split across PRs, `sdk/log` lands against an older `log` and fails with
-  `undefined: log.KeyValue`. A `packageRules` group keeps the normal update
-  path consistent — but see the security-PR caveat above.
+  `undefined: log.KeyValue`. Renovate's base preset already groups the normal
+  update path via `group:monorepos` — those arrive as
+  `renovate/opentelemetry-go-monorepo` and
+  `renovate/opentelemetry-go-contrib-monorepo`. Two kinds of otel PR escape
+  that grouping and can therefore land skewed:
+  - **Security PRs** (`renovate/security-<package>`), one per module, for the
+    forced-config reason above. This is what actually broke in practice.
+  - **Major bumps**, which `separateMajorMinor` splits out of the group
+    regardless (e.g. `otel/log` v0.x to v1 arriving on its own).
 - **`github.com/armon/go-metrics` is renamed.** It now declares its path as
   `github.com/hashicorp/go-metrics`, so any update to the old path fails
   `mod-check` with `module declares its path as ...`. Updates to that module
