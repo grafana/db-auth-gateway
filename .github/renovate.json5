@@ -14,14 +14,27 @@
     "github>grafana/grafana-renovate-config//presets/automerge",
   ],
 
-  // The go directive in go.mod uses go-mod-directive versioning, which Renovate
-  // treats as a minimum constraint and never bumps on its own. Switch it to
-  // rangeStrategy "bump" so Renovate tracks new Go releases (patch bumps
-  // auto-merge via the automerge preset; a minor bump needs manual approval).
   packageRules: [
+    // The go directive in go.mod uses go-mod-directive versioning, which Renovate
+    // treats as a minimum constraint and never bumps on its own. Switch it to
+    // rangeStrategy "bump" so Renovate tracks new Go releases (patch bumps
+    // auto-merge via the automerge preset; a minor bump needs manual approval).
     {
       matchDatasources: ["golang-version"],
       rangeStrategy: "bump",
+    },
+
+    // The otel Go modules share one release train: the stable v1.x modules
+    // (otel, sdk, trace, metric, the otlptrace exporters) and the v0.x
+    // log-signal ones (log, sdk/log, the otlplog exporters) are cut together,
+    // so v1.45.0 pairs with v0.21.0. Split across PRs they land mismatched —
+    // sdk/log v0.21.0 against log v0.19.0 fails to build with "undefined:
+    // log.KeyValue". contrib and proto/otlp ship from their own repos but pin
+    // the core versions, so they join the group to keep the set consistent.
+    {
+      groupName: "OpenTelemetry Go modules",
+      matchManagers: ["gomod"],
+      matchPackageNames: ["/^go\\.opentelemetry\\.io\\//"],
     },
   ],
 
