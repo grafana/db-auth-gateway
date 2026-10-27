@@ -164,7 +164,10 @@ func newHTTPProxy(name string, cfg Config, enableHTTP2 bool, logger log.Logger, 
 	// Separate Proxy for Writes with added buffer pool
 	proxyHandler := wrapMaxBytesHandler(&httputil.ReverseProxy{
 		ErrorHandler: errorHandler,
-		Director: func(req *http.Request) {
+		// TODO: Migrate to Rewrite before the v0.0.3 release. Rewrite removes Forwarded,
+		// X-Forwarded-For, X-Forwarded-Host and X-Forwarded-Proto before the callback runs,
+		// so the migration has to decide explicitly which of them to send onwards.
+		Director: func(req *http.Request) { //nolint:staticcheck // Deprecated since Go 1.26 in favour of Rewrite.
 			ctx := req.Context()
 			orgID, _ := user.ExtractOrgID(ctx)
 
