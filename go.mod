@@ -18,8 +18,8 @@ require (
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.23.2
-	github.com/prometheus/common v0.70.1
+	github.com/prometheus/client_golang v1.25.0
+	github.com/prometheus/common v0.72.0
 	github.com/prometheus/prometheus v0.312.0
 	github.com/sercand/kuberesolver/v6 v6.0.1
 	github.com/stretchr/testify v1.12.1
