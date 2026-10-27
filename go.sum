@@ -158,8 +158,8 @@ github.com/grafana/regexp v0.0.0-20250905093917-f7b3be9d1853 h1:cLN4IBkmkYZNnk7E
 github.com/grafana/regexp v0.0.0-20250905093917-f7b3be9d1853/go.mod h1:+JKpmjMGhpgPL+rXZ5nsZieVzvarn86asRlBg4uNGnk=
 github.com/grpc-ecosystem/go-grpc-prometheus v1.2.1-0.20230405093142-a5446fa24890 h1:DiV2lImyjTyjZkU+yUuR7yOOzUrL+HJnnHWqqQIbqgY=
 github.com/grpc-ecosystem/go-grpc-prometheus v1.2.1-0.20230405093142-a5446fa24890/go.mod h1:3bDW6wMZJB7tiONtC/1Xpicra6Wp5GgbTbQWCbI5fkc=
-github.com/grpc-ecosystem/grpc-gateway/v2 v2.31.0 h1:Bd7KaOxzULLxtZ/K5s1aLbWhR0+5RToO65TXHsf3bqQ=
-github.com/grpc-ecosystem/grpc-gateway/v2 v2.31.0/go.mod h1:nN7ts3dFXKtCZWc//yfkpcQNKJABg16/uDVAZpLDalo=
+github.com/grpc-ecosystem/grpc-gateway/v2 v2.32.0 h1:QMILzF8BA7xftE4zVORkRrlv08m12St3csK4RsyRgRs=
+github.com/grpc-ecosystem/grpc-gateway/v2 v2.32.0/go.mod h1:+ZQ6iUL8+ATyxGDQNuRKpNwJFdGDUi0e7E1QL9MvI7U=
 github.com/grpc-ecosystem/grpc-opentracing v0.0.0-20180507213350-8e809c8a8645/go.mod h1:6iZfnjpejD4L/4DwD7NryNaJyCQdzwWwH2MWhCA90Kw=
 github.com/hashicorp/consul/api v1.35.0 h1:4ULHUF0DDHcDqQE48KpdbV7PIIQDua3UaJ/bEcUiTE0=
 github.com/hashicorp/consul/api v1.35.0/go.mod h1:RwV43v4y1mHVnJY2V9m89rR/0mDF9QL6q7+G0Rkma/I=
