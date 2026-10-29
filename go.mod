@@ -75,7 +75,7 @@ require (
 	github.com/hashicorp/memberlist v0.7.0 // indirect
 	github.com/hashicorp/serf v0.11.0 // indirect
 	github.com/jaegertracing/jaeger-idl v0.14.0 // indirect
-	github.com/jpillora/backoff v1.0.0 // indirect
+	github.com/jpillora/backoff v1.1.0 // indirect
 	github.com/klauspost/compress v1.20.3 // indirect
 	github.com/mattn/go-colorable v0.1.16 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect
