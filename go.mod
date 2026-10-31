@@ -19,7 +19,7 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.25.0
-	github.com/prometheus/common v0.72.1
+	github.com/prometheus/common v0.73.0
 	github.com/prometheus/prometheus v0.315.1
 	github.com/sercand/kuberesolver/v6 v6.0.1
 	github.com/stretchr/testify v1.12.1
@@ -70,6 +70,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-rootcerts v1.1.0 // indirect
 	github.com/hashicorp/go-sockaddr v1.0.7 // indirect
+	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/hashicorp/memberlist v0.7.0 // indirect
@@ -85,6 +86,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/opentracing-contrib/go-stdlib v1.1.1 // indirect
+	github.com/pandatix/go-abnf v0.5.1 // indirect
 	github.com/pires/go-proxyproto v0.16.0 // indirect
 	github.com/prometheus/client_model v0.6.3 // indirect
 	github.com/prometheus/exporter-toolkit v0.20.0 // indirect
