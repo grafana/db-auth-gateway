@@ -8,7 +8,7 @@ require (
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/snappy v1.0.0
 	github.com/gorilla/mux v1.8.1
-	github.com/grafana/dskit v0.0.0-20260513101413-57dc7410e84a
+	github.com/grafana/dskit v0.0.0-20260915124504-450ba90a4aad
 	github.com/grafana/e2e v0.1.2-0.20260914044258-ebe09ad459cf
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.1-0.20230405093142-a5446fa24890
 	github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f
@@ -93,9 +93,9 @@ require (
 	github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529 // indirect
 	github.com/uber/jaeger-client-go v2.30.0+incompatible // indirect
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
-	go.etcd.io/etcd/api/v3 v3.6.9 // indirect
-	go.etcd.io/etcd/client/pkg/v3 v3.6.14 // indirect
-	go.etcd.io/etcd/client/v3 v3.6.9 // indirect
+	go.etcd.io/etcd/api/v3 v3.7.1 // indirect
+	go.etcd.io/etcd/client/pkg/v3 v3.7.1 // indirect
+	go.etcd.io/etcd/client/v3 v3.7.1 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/bridges/prometheus v0.72.0 // indirect
 	go.opentelemetry.io/contrib/exporters/autoexport v0.72.0 // indirect
