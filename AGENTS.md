@@ -170,10 +170,23 @@ Recurring failures that are not the PR's fault:
     forced-config reason above. This is what actually broke in practice.
   - **Major bumps**, which `separateMajorMinor` splits out of the group
     regardless (e.g. `otel/log` v0.x to v1 arriving on its own).
-- **`github.com/armon/go-metrics` is renamed.** It now declares its path as
-  `github.com/hashicorp/go-metrics`, so any update to the old path fails
-  `mod-check` with `module declares its path as ...`. Updates to that module
-  path are not mergeable as-is.
+- **Indirect major-path bumps can never pass `mod-check`.** Renovate raises
+  bumps that change an indirect dependency's module *path*
+  (`github.com/x/y` to `github.com/x/y/v2`). Nothing in the tree imports the new
+  path, so `go mod tidy` reverts the change and `git diff --exit-code -- go.mod
+  go.sum` fails. Close these PRs with a short note rather than debugging them.
+  Past examples: `cenkalti/backoff` v5 to `/v7`, `hashicorp/go-immutable-radix`
+  to `/v2`, `hashicorp/golang-lru` to `/v2`, `go.yaml.in/yaml` v2 to `/v3`. A
+  repo-level `ignore` rule does not help because the org-wide hosted config
+  overrides it, and Renovate may raise a fresh PR for a later release, so expect
+  to close them again. Tell this apart from a PR that fails `mod-check` merely
+  because it is stale: those rebase clean.
+- **`github.com/armon/go-metrics` was renamed, and is gone.** At v0.7.0 it
+  declares its path as `github.com/hashicorp/go-metrics`, so updates to the old
+  path failed `mod-check` with `module declares its path as ...`. The module has
+  been dropped in favour of `github.com/hashicorp/go-metrics` (via the
+  memberlist fork bump, #112), so any Renovate PR for `armon/go-metrics` is
+  stale and should be closed.
 
 ## Commits and pull requests
 
