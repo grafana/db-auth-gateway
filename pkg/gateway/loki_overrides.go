@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/grafana/dskit/user"
-	"go.yaml.in/yaml/v3"
+	"go.yaml.in/yaml/v4"
 
 	"github.com/grafana/db-auth-gateway/pkg/router"
 )
