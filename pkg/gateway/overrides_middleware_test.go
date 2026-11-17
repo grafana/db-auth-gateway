@@ -15,7 +15,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.yaml.in/yaml/v3"
+	"go.yaml.in/yaml/v4"
 )
 
 func TestMimirOverridesMiddleware_GlobalSettings(t *testing.T) {
@@ -343,13 +343,13 @@ func TestValidateMimirOverrides(t *testing.T) {
 						t.Run("global overrides", func(t *testing.T) {
 							var global MimirGlobalOverrides
 							err := yaml.Unmarshal([]byte(fmt.Sprintf("%s: %s", setting, tc.value)), &global)
-							assert.Equal(t, tc.expectErr, err)
+							assert.ErrorIs(t, err, tc.expectErr)
 						})
 
 						t.Run("per-tenant overrides", func(t *testing.T) {
 							var tenant MimirTenantOverrides
 							err := yaml.Unmarshal([]byte(fmt.Sprintf("%s: %s", setting, tc.value)), &tenant)
-							assert.Equal(t, tc.expectErr, err)
+							assert.ErrorIs(t, err, tc.expectErr)
 						})
 					})
 				}
@@ -392,13 +392,13 @@ func TestValidateMimirOverrides(t *testing.T) {
 						t.Run("global overrides", func(t *testing.T) {
 							var global MimirGlobalOverrides
 							err := yaml.Unmarshal([]byte(fmt.Sprintf("%s: %s", setting, tc.value)), &global)
-							assert.Equal(t, tc.expectErr, err)
+							assert.ErrorIs(t, err, tc.expectErr)
 						})
 
 						t.Run("per-tenant overrides", func(t *testing.T) {
 							var tenant MimirTenantOverrides
 							err := yaml.Unmarshal([]byte(fmt.Sprintf("%s: %s", setting, tc.value)), &tenant)
-							assert.Equal(t, tc.expectErr, err)
+							assert.ErrorIs(t, err, tc.expectErr)
 						})
 					})
 				}
