@@ -9,7 +9,7 @@ require (
 	github.com/golang/snappy v1.0.0
 	github.com/gorilla/mux v1.8.1
 	github.com/grafana/dskit v0.0.0-20260915124504-450ba90a4aad
-	github.com/grafana/e2e v0.1.2-0.20260914044258-ebe09ad459cf
+	github.com/grafana/e2e v0.1.2-0.20261026011823-81b51f5a0481
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.1-0.20230405093142-a5446fa24890
 	github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f
 	github.com/mwitkow/grpc-proxy v0.0.0-20250813121105-2866842de9a5
